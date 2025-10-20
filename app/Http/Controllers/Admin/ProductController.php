@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Prodcut;
+use App\Models\Product;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Str;
 class ProductController extends Controller
 {
     /**
@@ -13,7 +13,7 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Prodcut::all();
+        $products = Product::all();
         return response()->json($products);
     }
 
@@ -30,22 +30,22 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-       $request->validate($request, [
+        // return response()->json($request->all());
+       $request->validate([
            'name' => 'required|unique:products',
-           'slug'  => 'required|unique:products',
            'price' => 'required',
-           'image' => 'required|mimes:png,jpg,webp,jpeg',
+           'image' => 'mimes:png,jpg,webp,jpeg',
        ]);
 
-       $product = new Prodcut();
+       $product = new Product();
        $product->name    = $request->name;
-       $product->slug    = $request->slug;
+       $product->slug    = Str::slug($request->name);
        $product->price   = $request->price;
        $product->discount_price = $request->discount_price;
-       $product->quantity = $request->quantity;
-       $product->status   = $request->status;
+       $product->quantity = 1;
+       $product->status   = 'active';
        $product->save();
-       return response()->json(200, 'Product created successfully');
+       return response()->json('Product created successfully');
     }
 
     /**
